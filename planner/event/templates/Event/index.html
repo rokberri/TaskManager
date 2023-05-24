@@ -1,0 +1,39 @@
+{% extends 'Event/layout.html' %}
+
+
+{% block content %}
+<div style="margin-top: 50px;" class="ui container">
+    <h1 class="ui center aligned header">Календарик</h1>
+    <form class="ui form" action="{% url 'add' %}" method="post">
+        {% csrf_token %}
+        <div class="field">
+            <label>Новая задача</label>
+            <input type="text" name="title" placeholder="Введите название задачи"><br>
+            <input type="text" name="description" placeholder="Введите описание задачи"><br>
+            <input type="date" name="date" required><br>
+        </div>
+        <button class="ui teal basic button" type="submit">Добавить</button>
+    </form>
+    {% for day in days %}
+        {% if day.date >= today%}
+            <div class="ui segment">
+                <p class="ui big header">{{day.date}} </p>
+                {% for event in events %}
+                    {% if event.date == day.date %}
+                        <p class="ui big header">{{ event.title }}</p>
+                        <p>{{ event.description }}</p>
+                        {% if event.is_complete == False %}
+                            <span class="ui gray label">Не завершено</span>
+                            <a class="ui primary basic button" href="{% url 'update' event_id=event.id %}">Закрыть</a>
+                            {% else %}
+                            <span class="ui green label">Завершено</span>
+                            <a class="ui blue button" href="{% url 'update' event_id=event.id %}">Открыть</a>
+                        {% endif %}
+                        <a class="ui negative basic button" href="{% url 'delete' day_id=day.id event_id=event.id %}">Удалить</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock content %}
